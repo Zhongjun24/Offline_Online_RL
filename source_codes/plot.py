@@ -28,12 +28,12 @@ def plot_final_vs_x(x, final_summary_by_algo: dict,
     })
 
     style = {
-        "zero": (r"\textsf{UCRL}", "o", "-", "#1f77b4"),
-        "merge": (r"\textsf{COMPLETE}", "P", "--", "#ff7f0e"),
-        "optimal": (r"\textsf{O--O UCRL--VLR (Optimal)}", "s", "-.", "#2ca02c"),
-        "pessimistic": (r"\textsf{O--O UCRL--VLR (pessimistic)}", "^", ":", "#d62728"),
-        "dp_ucb": (r"\textsf{DP--LSVI}", "D", "--", "#9467bd"),
-        "ucbvi": (r"\textsf{UCBVI}", "X", "-", "#8c564b"),
+        "zero": (r"\textsf{UCRL}", "o", "-", "#f8766d"),
+        "merge": (r"\textsf{COMPLETE}", "P", "--", "#a3a500"),
+        "optimal": (r"\textsf{O--O UCRL--VLR (Optimal)}", "s", "-.", "#00b0f6"),
+        "pessimistic": (r"\textsf{O--O UCRL--VLR (pessimistic)}", "^", ":", "#7f7f7f"),
+        "dp_ucb": (r"\textsf{DP--LSVI}", "D", "--", "#d89000"),
+        "ucbvi": (r"\textsf{UCBVI}", "X", "-", "#00bf7d"),
     }
 
     order = ["zero", "merge", "dp_ucb", "ucbvi", "optimal", "random"]
@@ -118,29 +118,44 @@ def plot_two_algos_multi_curves(
     z = np.asarray(z, dtype=float)
     x = np.maximum(z, eps) if xlog else z
 
-    # Algo-level styling
-    algo_style = {
-        "zero":    (r"\textsf{UCRL}",    "o", "-"),
-        "optimal": (r"\textsf{UCRL (optimal)}", "s", "--"),
+    # Fixed colors for the non-zero curves only
+    fixed_curve_colors = [
+        "#f8766d",  # red
+        "#a3a500",  # yellow-green
+        "#00b0f6",  # blue
+        "#7f7f7f",  # purple
+    ]
+
+    zero_color = "#7f7f7f"  # black for UCRL baseline
+
+    curve_labels = list(curves_out.keys())
+    if len(curve_labels) > len(fixed_curve_colors):
+        raise ValueError(
+            f"At most {len(fixed_curve_colors)} curves are supported, "
+            f"but got {len(curve_labels)}."
+        )
+
+    curve_color_map = {
+        curve_label: fixed_curve_colors[i]
+        for i, curve_label in enumerate(curve_labels)
     }
 
-    # Curve-level variations
-    curve_markers = ["o", "s", "^", "D", "X", "v", "<", ">", "P", "*"]
-    curve_linestyles = ["-", "--", "-.", ":", (0, (3, 1, 1, 1)), (0, (5, 2))]
+    # Algo-level styling
+    algo_style = {
+        "zero":    (r"\textsf{UCRL}", "o", "-"),
+        "optimal": (r"\textsf{O--O UCRL--VLR (optimal)}", "s", "--"),
+    }
+
+    # Curve-level linestyle variation
+    curve_linestyles = ["-", "--", "-.", ":"]
 
     fig, ax = plt.subplots(figsize=(8.2, 5.8))
 
-    # ----------------------------
-    # Plot curves
-    # ----------------------------
     for c_idx, (curve_label, per_algo) in enumerate(curves_out.items()):
         ls2 = curve_linestyles[c_idx % len(curve_linestyles)]
+        curve_color = curve_color_map[curve_label]
 
         for algo_key in algo_keys:
-            # ----------------------------
-            # KEY CHANGE:
-            # zero only plotted for first curve
-            # ----------------------------
             if algo_key == "zero" and c_idx > 0:
                 continue
 
@@ -160,21 +175,34 @@ def plot_two_algos_multi_curves(
 
             if algo_key == "zero":
                 label = base_label
+                color = zero_color
+                linestyle = "-"
             else:
                 label = rf"{base_label}\;\; \textsf{{{curve_label}}}"
+                color = curve_color
+                linestyle = ls2
 
             ax.plot(
-                x, mean,
-                linestyle=ls2,
+                x,
+                mean,
+                linestyle=linestyle,
                 marker=base_marker,
                 linewidth=2.4,
                 markersize=12,
+                color=color,
                 label=label,
             )
-            #ax.fill_between(x, lo, hi, alpha=0.18, linewidth=0)
 
-    ax.set_xlabel(xlabel, fontsize = 24)
-    ax.set_ylabel(ylabel, fontsize = 24)
+            # Uncomment if you want confidence bands
+            # ax.fill_between(
+            #     x, lo, hi,
+            #     alpha=0.18,
+            #     linewidth=0,
+            #     color=color,
+            # )
+
+    ax.set_xlabel(xlabel, fontsize=24)
+    ax.set_ylabel(ylabel, fontsize=24)
     ax.grid(True, which="both", alpha=0.25)
 
     if xlog:
@@ -189,11 +217,12 @@ def plot_two_algos_multi_curves(
         frameon=False,
         handlelength=2.5,
         columnspacing=1.6,
-        fontsize =20
+        fontsize=20,
     )
 
     fig.subplots_adjust(bottom=0.32)
     fig.savefig(save_path, dpi=300, bbox_inches="tight")
+    plt.close(fig)
 
 
 def plot_with_bands(summary: dict, title: str, save_path: str, n_points: int = 10):
@@ -215,12 +244,12 @@ def plot_with_bands(summary: dict, title: str, save_path: str, n_points: int = 1
     })
 
     style = {
-        "zero": (r"\textsf{UCRL}", "o", "-", "#1f77b4"),
-        "merge": (r"\textsf{COMPLETE}", "P", "--", "#ff7f0e"),
-        "optimal": (r"\textsf{O--O UCRL--VLR (Optimal)}", "s", "-.", "#2ca02c"),
-        "pessimistic": (r"\textsf{O--O UCRL--VLR (pessimistic)}", "^", ":", "#d62728"),
-        "dp_ucb": (r"\textsf{DP--LSVI}", "D", "--", "#9467bd"),
-        "ucbvi": (r"\textsf{UCBVI}", "X", "-", "#8c564b"),
+        "zero": (r"\textsf{UCRL}", "o", "-", "#f8766d"),
+        "merge": (r"\textsf{COMPLETE}", "P", "--", "#a3a500"),
+        "optimal": (r"\textsf{O--O UCRL--VLR (Optimal)}", "s", "-.", "#00b0f6"),
+        "pessimistic": (r"\textsf{O--O UCRL--VLR (pessimistic)}", "^", ":", "#7f7f7f"),
+        "dp_ucb": (r"\textsf{DP--LSVI}", "D", "--", "#d89000"),
+        "ucbvi": (r"\textsf{UCBVI}", "X", "-", "#00bf7d"),
     }
 
     any_key = next(iter(summary))
@@ -240,8 +269,6 @@ def plot_with_bands(summary: dict, title: str, save_path: str, n_points: int = 1
         label, marker, ls, color = style.get(key, (key, "o", "-", None))
 
         mean = np.asarray(summary[key]["mean"])[idx]
-        if key == 'pessimistic':
-            mean = mean - 3.8
         lo   = np.asarray(summary[key]["lo"])[idx]
         hi   = np.asarray(summary[key]["hi"])[idx]
 
@@ -267,15 +294,16 @@ def plot_with_bands(summary: dict, title: str, save_path: str, n_points: int = 1
 def _algo_style_and_order_for_legend():
     # keep consistent with your plot styles
     style = {
-        "zero": (r"\textsf{UCRL}", "o", "-", "#1f77b4"),
-        "merge": (r"\textsf{COMPLETE}", "P", "--", "#ff7f0e"),
-        "optimal": (r"\textsf{O--O UCRL--VLR (Optimal)}", "s", "-.", "#2ca02c"),
-        "pessimistic": (r"\textsf{O--O UCRL--VLR (pessimistic)}", "^", ":", "#d62728"),
-        "dp_ucb": (r"\textsf{DP--LSVI}", "D", "--", "#9467bd"),
-        "ucbvi": (r"\textsf{UCBVI}", "X", "-", "#8c564b"),
+        "zero": (r"\textsf{UCRL}", "o", "-", "#f8766d"),
+        "merge": (r"\textsf{COMPLETE}", "P", "--", "#a3a500"),
+        "optimal": (r"\textsf{O--O UCRL--VLR (Optimal)}", "s", "-.", "#00b0f6"),
+        "pessimistic": (r"\textsf{O--O UCRL--VLR (pessimistic)}", "^", ":", "#7f7f7f"),
+        "dp_ucb": (r"\textsf{DP--LSVI}", "D", "--", "#d89000"),
+        "ucbvi": (r"\textsf{UCBVI}", "X", "-", "#00bf7d"),
     }
     #order = ["zero", "merge", "dp_ucb", "ucbvi", "optimal", "pessimistic"]
     order = ["zero", "merge", "dp_ucb", "ucbvi", "optimal"]
+    #order = ["zero", "merge", "optimal", "pessimistic"]
     return style, order
 
 

@@ -3,12 +3,14 @@
 ## Citation
 
 If you use this code or build on this work, please cite:
+```bibtex
 @article{zhang2026offline,
   title={Offline-Online Reinforcement Learning for Linear Mixture MDPs},
   author={Zhang, Zhongjun and Sinclair, Sean R},
   journal={arXiv preprint arXiv:2604.11994},
   year={2026}
 }
+```
 
 ---
 

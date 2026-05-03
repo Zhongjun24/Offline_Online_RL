@@ -94,7 +94,7 @@ pip install -r requirements.txt
 
 ### Runtime notes
 
-* Simulation sweeps may take several minutes depending on parameter settings
+* Simulation sweeps may take tens of hours (under $50$ runs) depending on parameter settings
 * Cached `.pkl` files are used to avoid recomputation
 * Random seeds are fixed where appropriate for reproducibility
 

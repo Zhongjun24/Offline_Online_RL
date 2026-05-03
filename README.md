@@ -140,6 +140,15 @@ source_codes/hyperparam.py
 Key configuration:
 
 * `plt_choice`: selects which figure to generate
+
+The code supports the following figure options through `SimConfig.plt_choice`:
+
+- `"A"`: final regret versus `Delta`
+- `"B"`: final regret versus `M_off`
+- `"C"`: final regret versus `tau`
+- `"D"`: final regret versus `tau` under custom `Delta(tau)` curves
+- `"E"`: regret curves over online episodes `K`
+- `"legend"`: legend-only export for figure assembly
 * `if_running`:
 
   * `1` → run simulations

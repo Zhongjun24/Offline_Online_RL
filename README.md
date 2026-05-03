@@ -165,6 +165,19 @@ Figures are saved in the working directory, including:
 
 Cached intermediate results are stored as `.pkl` files.
 
+### Example workflow
+
+1. Open `source_codes/hyperparam.py`.
+2. Set `plt_choice` to the panel you want.
+3. Set `if_running = 1` to run simulations and cache results.
+4. Run:
+
+```bash
+python source_codes/main.py
+```
+
+If cached result files already exist, setting `if_running = 0` reloads them instead of rerunning the simulations.
+
 ---
 
 All scripts use relative paths and can be executed independently once the environment is set up. Running the simulation pipeline reproduces all reported experimental results.

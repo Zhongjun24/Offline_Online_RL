@@ -1,11 +1,5 @@
 # Offline–Online Reinforcement Learning for Linear Mixture MDPs
 
-## Manuscript
-
-**Offline–Online Reinforcement Learning for Linear Mixture MDPs**
-
----
-
 ## Citation
 
 If you use this code, please cite the associated paper.

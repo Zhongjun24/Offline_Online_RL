@@ -165,7 +165,7 @@ Figures are saved in the working directory, including:
 
 Cached intermediate results are stored as `.pkl` files.
 
-### Example workflow
+## 6. Example workflow
 
 1. Open `source_codes/hyperparam.py`.
 2. Set `plt_choice` to the panel you want.
@@ -177,6 +177,17 @@ python source_codes/main.py
 ```
 
 If cached result files already exist, setting `if_running = 0` reloads them instead of rerunning the simulations.
+
+## 7. Baseline algorithms included
+
+The simulation pipeline compares the proposed method against several baselines, including:
+
+- `zero`: online-only / no useful offline value design
+- `optimal`: proposed offline value-function design
+- `pessimistic`: pessimistic offline value-function design
+- `merge`: naive merge baseline that effectively assumes no environment shift
+- `dp_ucb`: tabular baseline from the Chen et al. style implementation
+- `ucbvi`: tabular online baseline
 
 ---
 

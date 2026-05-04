@@ -3,10 +3,6 @@ import numpy as np
 class DataPooling_UCB_Theorem2_Tabular:
     """
     Tabular data pooling perturbed LSVI (UCB flavor): xi = 1.
-
-    Interface matches your existing algorithm:
-      __init__(mdp_on, cfg, Vtilde, off_states, off_actions)
-      run(rng) -> regret shape (K,)
     """
     def __init__(self, mdp_on, cfg, off_states, off_actions):
         self.mdp = mdp_on
@@ -16,12 +12,10 @@ class DataPooling_UCB_Theorem2_Tabular:
 
         self.S, self.A, self.H = cfg.S, cfg.A, cfg.H
 
-        # Offline empirical counts + sums (indexed by h=1..H)
         self.N_off = np.zeros((self.H + 1, self.S, self.A), dtype=int)
         self.R_off_sum = np.zeros((self.H + 1, self.S, self.A), dtype=float)
         self.P_off_cnt = np.zeros((self.H + 1, self.S, self.A, self.S), dtype=int)
 
-        # Online empirical counts + sums
         self.n_on = np.zeros((self.H + 1, self.S, self.A), dtype=int)
         self.R_on_sum = np.zeros((self.H + 1, self.S, self.A), dtype=float)
         self.P_on_cnt = np.zeros((self.H + 1, self.S, self.A, self.S), dtype=int)
@@ -33,14 +27,13 @@ class DataPooling_UCB_Theorem2_Tabular:
             return
         cfg = self.cfg
 
-        # off_states: shape (M_off, H+1), off_actions: shape (M_off, H)
         for m in range(cfg.M_off):
             for h in range(1, cfg.H + 1):
                 s = int(self.off_states[m, h - 1])
                 a = int(self.off_actions[m, h - 1])
                 sp = int(self.off_states[m, h])
 
-                r = float(self.mdp.r[s, a])  # your environment uses known r-table
+                r = float(self.mdp.r[s, a]) 
                 self.N_off[h, s, a] += 1
                 self.R_off_sum[h, s, a] += r
                 self.P_off_cnt[h, s, a, sp] += 1
@@ -57,13 +50,12 @@ class DataPooling_UCB_Theorem2_Tabular:
         # coverage-controlled state subset (same convention as before)
         # ------------------------------------------------------------
         if cfg.coverage_obs == 0:
-            S1 = set(range(self.S // 2))  # consistent with your two-region design
+            S1 = set(range(self.S // 2))  # consistent with the two-region design
             p_keep = float(np.clip(cfg.z_action0, 0.0, 1.0))
         else:
             S1 = None
             p_keep = 1.0
     
-        # off_states: shape (M_off, H+1), off_actions: shape (M_off, H)
         for m in range(cfg.M_off):
             for h in range(1, cfg.H + 1):
                 s = int(self.off_states[m, h - 1])
@@ -85,17 +77,11 @@ class DataPooling_UCB_Theorem2_Tabular:
         self._offline_phase_done = True
 
     def _log_term(self):
-        # In the theorem you showed: log(2 H S A T / delta)
-        # Use T = K*H (total time steps) to be conservative.
         cfg = self.cfg
         T = max(1, cfg.K)
         return np.log(max(2.0 * cfg.H * cfg.S * cfg.A * T / cfg.delta_conf, 1000.0))
 
     def _lambda_dp(self, n: int, N: int):
-        """
-        lambda^{DP}(n, Δ, N, δ) as in your screenshot (piecewise).
-        Numerical guards added.
-        """
         cfg = self.cfg
         if cfg.Delta <= 0:
             return 1.0
@@ -121,11 +107,6 @@ class DataPooling_UCB_Theorem2_Tabular:
         return float(np.clip(lam, 0.0, 1.0))
 
     def _epsilon_dp(self, lam: float, n: int, N: int):
-        """
-        epsilon_V^{DP} from your screenshot:
-          H * sqrt( logterm * ( lam^2/(2n) + (1-lam)^2/(2N) ) ) + H(1-lam)Δ
-        Uses max(1,n), max(1,N) for stability when counts are zero.
-        """
         cfg = self.cfg
         L = self._log_term()
 

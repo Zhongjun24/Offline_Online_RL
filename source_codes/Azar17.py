@@ -71,7 +71,7 @@ class UCBVI_CH_Tabular:
                             q = min(float(self.Q_prev[h, s, a]), float(self.H), q_ucb)
 
                         if cfg.clip_value:
-                            # your existing per-step horizon clip
+                            # the existing per-step horizon clip
                             q = float(np.clip(q, 0.0, cfg.H - h + 1))
 
                         Q[h, s, a] = q

@@ -25,7 +25,6 @@ class OfflineOnlineUCRL_TabularBlocks:
                 self.Mall[s, a] = cfg.lam * np.eye(self.S)
 
         self.Goff = np.zeros((self.S, self.A, self.S, self.S), dtype=float)
-        #self.merge_scale = cfg.M_off/cfg.K/3
         self.merge_scale = 1
 
     def _logdet_sum_blocks(self, Mblocks):
@@ -67,12 +66,10 @@ class OfflineOnlineUCRL_TabularBlocks:
         log_det_on_half = 0.5 * logdet_on
         log_det_all_half = 0.5 * logdet_all
 
-        # beta_k = H*sqrt(2 log( det(Mon)^{1/2} / (det(lam I)^{1/2} delta) )) + sqrt(lam)B
         inside_beta = 2.0 * ((log_det_on_half - log_det_lamI_half) + np.log(1.0 / cfg.delta_conf))
         inside_beta = max(0.0, inside_beta)
         beta_k = cfg.H * np.sqrt(inside_beta) + np.sqrt(cfg.lam) * cfg.B
 
-        # gamma_k = H*sqrt(2 log( det(Mall)^{1/2} K / det(lam I)^{1/2} )) + shift_term + sqrt(lam)B
         lam_max_goff = self._lambda_max_Goff()
         lam_min_lamI_goff = self._lambda_min_lamI_plus_Goff()
         shift_term = cfg.Delta * (lam_max_goff / np.sqrt(max(1e-30, lam_min_lamI_goff)))
@@ -113,7 +110,7 @@ class OfflineOnlineUCRL_TabularBlocks:
         S, A, H = self.S, self.A, self.H
     
         # ------------------------------------------------------------
-        # Case 1: keep your original offline_phase behavior
+        # Case 1: keep the original offline_phase behavior
         # ------------------------------------------------------------
         if cfg.tildeV_mode != "pessimistic":
             for m in range(cfg.M_off):
@@ -200,8 +197,6 @@ class OfflineOnlineUCRL_TabularBlocks:
             P_all_hat = np.zeros((self.S, self.A, self.S), dtype=float)
             for s in range(self.S):
                 for a in range(self.A):
-                    #P_on_hat[s, a] = simplex_projection(np.linalg.solve(self.Mon[s, a], self.won[s, a]))
-                    #P_all_hat[s, a] = simplex_projection(np.linalg.solve(self.Mall[s, a], self.wall[s, a]))
                     P_on_hat[s, a] = np.linalg.solve(self.Mon[s, a], self.won[s, a])
                     P_all_hat[s, a] = np.linalg.solve(self.Mall[s, a], self.wall[s, a])
 

@@ -228,7 +228,7 @@ def sample_offline_from_online1(
 
     # -----------------------------
     # 1) compute a "badness score" v(s)
-    #    use WORST policy value (can switch to V* if you want)
+    #    use WORST policy value (can switch to V*)
     # -----------------------------
     V = np.zeros((H + 2, S))
     for h in range(H, 0, -1):
@@ -250,7 +250,7 @@ def sample_offline_from_online1(
             p = P[s, a].copy()
             q = p.copy()
 
-            # L1 budget: moving ε mass costs 2ε in L1
+            # L1 budget: moving ε mass costs 2epsilon in L1
             budget = 0.5 * Delta
 
             # donors: high v; receivers: low v

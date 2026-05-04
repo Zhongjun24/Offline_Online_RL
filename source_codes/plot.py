@@ -37,11 +37,9 @@ def plot_final_vs_x(x, final_summary_by_algo: dict,
     }
 
     order = ["zero", "merge", "dp_ucb", "ucbvi", "optimal", "random"]
-    #order = ["zero", "merge", "optimal", "random"]
 
     x = np.asarray(x, dtype=float)
     x = np.maximum(x, eps)   # ---- protect log x ----
-    #x = x[:-2]
 
     fig, ax = plt.subplots(figsize=(8.2, 5.8))
 
@@ -59,30 +57,15 @@ def plot_final_vs_x(x, final_summary_by_algo: dict,
         lo   = np.maximum(lo, eps)[:len(x)]
         hi   = np.maximum(hi, eps)[:len(x)]
 
-        # mean = np.minimum(mean, eps_maximum)
-        # lo   = np.minimum(lo, eps_maximum)
-        # hi   = np.minimum(hi, eps_maximum)
-
         ax.plot(x, mean, linestyle=ls, marker=marker, color=color, label=label, linewidth=2.4, markersize=12)
-        #ax.fill_between(x, lo, hi, alpha=0.18)
 
     ax.set_xlabel(xlabel, fontsize = 24)
     ax.set_ylabel(r"\textsf{Regret}$(K)$",fontsize = 24)
 
     # ---- LOG–LOG ----
     ax.set_xscale("log")
-    #ax.set_yscale("log")
 
     ax.grid(True, which="both", alpha=0.25)
-
-    # ax.legend(
-    #     loc="upper center",
-    #     bbox_to_anchor=(0.5, -0.20),
-    #     ncol=3,
-    #     frameon=False,
-    #     handlelength=2.5,
-    #     columnspacing=1.6,
-    # )
 
     fig.subplots_adjust(bottom=0.30)
     fig.savefig(save_path, dpi=300, bbox_inches="tight")
@@ -120,13 +103,13 @@ def plot_two_algos_multi_curves(
 
     # Fixed colors for the non-zero curves only
     fixed_curve_colors = [
-        "#f8766d",  # red
-        "#a3a500",  # yellow-green
-        "#00b0f6",  # blue
-        "#7f7f7f",  # purple
+        "#f8766d",  
+        "#a3a500",  
+        "#00b0f6",  
+        "#7f7f7f",  
     ]
 
-    zero_color = "#7f7f7f"  # black for UCRL baseline
+    zero_color = "#7f7f7f" 
 
     curve_labels = list(curves_out.keys())
     if len(curve_labels) > len(fixed_curve_colors):
@@ -192,14 +175,6 @@ def plot_two_algos_multi_curves(
                 color=color,
                 label=label,
             )
-
-            # Uncomment if you want confidence bands
-            # ax.fill_between(
-            #     x, lo, hi,
-            #     alpha=0.18,
-            #     linewidth=0,
-            #     color=color,
-            # )
 
     ax.set_xlabel(xlabel, fontsize=24)
     ax.set_ylabel(ylabel, fontsize=24)
@@ -279,20 +254,10 @@ def plot_with_bands(summary: dict, title: str, save_path: str, n_points: int = 1
     ax.set_ylabel(r"\textsf{Regret}$(K)$",fontsize = 24)
     ax.grid(True, which="major", alpha=0.25)
 
-    # ax.legend(
-    #     loc="upper center",
-    #     bbox_to_anchor=(0.5, -0.20),
-    #     ncol=3,
-    #     frameon=False,
-    #     handlelength=2.5,
-    #     columnspacing=1.6,
-    # )
-
     fig.subplots_adjust(bottom=0.30)
     fig.savefig(save_path, dpi=300, bbox_inches="tight")
 
 def _algo_style_and_order_for_legend():
-    # keep consistent with your plot styles
     style = {
         "zero": (r"\textsf{UCRL}", "o", "-", "#f8766d"),
         "merge": (r"\textsf{COMPLETE}", "P", "--", "#a3a500"),
@@ -301,9 +266,7 @@ def _algo_style_and_order_for_legend():
         "dp_ucb": (r"\textsf{DP--LSVI}", "D", "--", "#d89000"),
         "ucbvi": (r"\textsf{UCBVI}", "X", "-", "#00bf7d"),
     }
-    #order = ["zero", "merge", "dp_ucb", "ucbvi", "optimal", "pessimistic"]
     order = ["zero", "merge", "dp_ucb", "ucbvi", "optimal"]
-    #order = ["zero", "merge", "optimal", "pessimistic"]
     return style, order
 
 
@@ -322,7 +285,6 @@ def save_legend_only(
     else:
         algo_subset = [k for k in order if k in set(algo_subset)]
 
-    # IMPORTANT: match your plotting rcParams so LaTeX renders
     plt.rcParams.update({
         "text.usetex": True,
         "font.family": "serif",
@@ -340,7 +302,7 @@ def save_legend_only(
     fig, ax = plt.subplots(figsize=(8, 1.2))
     ax.axis("off")
 
-    # Create dummy artists via ax.plot so color cycle is applied (different colors)
+    # Create dummy artists visa ax.plot so color cycle is applied (different colors)
     for key in algo_subset:
         if key not in style:
             continue
@@ -358,13 +320,12 @@ def save_legend_only(
     leg = ax.legend(
         loc="center",
         ncol=3,
-        frameon=True,          # set False if you don't want the box
+        frameon=True,          # set False if don't want the box
         fontsize=fontsize,
         handlelength=handlelength,
         columnspacing=columnspacing,
     )
 
-    # tight bounding box around legend
     fig.canvas.draw()
     bbox = leg.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
     fig.savefig(save_path, dpi=300, bbox_inches=bbox)

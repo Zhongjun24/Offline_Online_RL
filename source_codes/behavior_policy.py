@@ -68,7 +68,7 @@ class TildeVDesigner:
 
         # coverage-controlled state subset
         if coverage_obs == 0:
-            S1 = set(range(self.S // 2))  # consistent with your two-region design
+            S1 = set(range(self.S // 2))  # consistent with the two-region design
             p_keep = float(np.clip(z_action0, 0.0, 1.0))
         else:
             S1 = None

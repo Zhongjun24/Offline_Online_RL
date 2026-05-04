@@ -64,7 +64,6 @@ def summarize_final_at_K(curves_runs: dict, q_lo=0.2, q_hi=0.8, cumulative: bool
         else:
             y = regs[:, -1]                      # per-episode regret at K
 
-        #y = np.minimum(y, 50)
         out[name] = {
             "mean": float(np.mean(y)),
             "lo":   float(np.quantile(y, q_lo)),
@@ -156,8 +155,6 @@ def run_curves_many_fixed_online_for_sweep(
             cfg_x = SimConfig(**{**cfg_x.__dict__, "seed": seed_i})
 
             # 3) offline MDP from the SAME mdp_on_i, using cfg_x.
-            #    (offline env should depend on Delta and whatever else you encode into cfg_x;
-            #     z_action0/M_off affect DATA, not P_off itself, so they appear via collect_offline below.)
             mdp_off_ij = sample_offline_from_online1(
                 mdp_on_i,
                 cfg_x.if_shuffle,
@@ -452,7 +449,7 @@ def sweep_over_z_with_custom_Delta_curves_shared_online(
         curve_labels = [f"curve_{c}" for c in range(C)]
     assert len(curve_labels) == C
 
-    settings = _get_algo_settings()  # your algo settings dict
+    settings = _get_algo_settings()  # the algo settings dict
 
 
     if if_running:
@@ -546,7 +543,6 @@ def sweep_over_z_with_custom_Delta_curves_shared_online(
                             rng_algo=rng_algo,
                         )
     
-                        # summarize scalar-at-K now (so memory small)
                         if cumulative:
                             y = float(np.sum(reg_curve))  # cumulative regret at K
                         else:
@@ -595,90 +591,3 @@ def _plot_style_and_order():
     order = ["zero", "merge", "dp_ucb", "ucbvi", "optimal", "pessimistic"]
     return style, order
 
-
-# # -----------------------------
-# # 2) NEW: plot helpers that draw onto an existing axis
-# #    (so we can do subplots + unified legend)
-# # -----------------------------
-# def plot_final_vs_x_on_ax(
-#     ax,
-#     x,
-#     final_summary_by_algo: dict,
-#     xlabel: str,
-#     ylabel: str,
-#     algo_keep=None,       # list of algo keys to draw on this subplot
-#     xlog=True,
-#     ylog=False,
-#     eps=1e-8,
-# ):
-#     style, order = _plot_style_and_order()
-#     keep = set(order) if algo_keep is None else set(algo_keep)
-
-#     x = np.asarray(x, dtype=float)
-#     if xlog:
-#         x = np.maximum(x, eps)
-
-#     for key in order:
-#         if key not in keep:
-#             continue
-#         if key not in final_summary_by_algo:
-#             continue
-
-#         label, marker, ls = style.get(key, (key, "o", "-"))
-#         mean = np.asarray(final_summary_by_algo[key]["mean"], dtype=float)
-#         lo   = np.asarray(final_summary_by_algo[key]["lo"], dtype=float)
-#         hi   = np.asarray(final_summary_by_algo[key]["hi"], dtype=float)
-
-#         if ylog:
-#             mean = np.maximum(mean, eps)
-#             lo   = np.maximum(lo, eps)
-#             hi   = np.maximum(hi, eps)
-
-#         ax.plot(x, mean, linestyle=ls, marker=marker, label=label, linewidth=1, markersize=5)
-#         ax.fill_between(x, lo, hi, alpha=0.18)
-
-#     ax.set_xlabel(xlabel)
-#     ax.set_ylabel(ylabel)
-#     if xlog:
-#         ax.set_xscale("log")
-#     if ylog:
-#         ax.set_yscale("log")
-#     ax.grid(True, which="major", alpha=0.20)
-
-
-# def plot_with_bands_on_ax(
-#     ax,
-#     summary: dict,
-#     xlabel=r"$K$",
-#     ylabel=r"\textsf{Cumulative Regret}",
-#     algo_keep=None,       # list of algo keys to draw on this subplot
-#     n_points=12,
-# ):
-#     style, order = _plot_style_and_order()
-#     keep = set(order) if algo_keep is None else set(algo_keep)
-
-#     any_key = next(iter(summary))
-#     K = len(summary[any_key]["mean"])
-#     if n_points >= K:
-#         idx = np.arange(K)
-#     else:
-#         idx = np.unique(np.round(np.linspace(0, K - 1, n_points)).astype(int))
-#     x = idx + 1
-
-#     for key in order:
-#         if key not in keep:
-#             continue
-#         if key not in summary:
-#             continue
-
-#         label, marker, ls = style.get(key, (key, "o", "-"))
-#         mean = np.asarray(summary[key]["mean"])[idx]
-#         lo   = np.asarray(summary[key]["lo"])[idx]
-#         hi   = np.asarray(summary[key]["hi"])[idx]
-
-#         ax.plot(x, mean, linestyle=ls, marker=marker, label=label, linewidth=1, markersize=5)
-#         ax.fill_between(x, lo, hi, alpha=0.18)
-
-#     ax.set_xlabel(xlabel)
-#     ax.set_ylabel(ylabel)
-#     ax.grid(True, which="major", alpha=0.20)
